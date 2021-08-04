@@ -67,11 +67,31 @@ function update() {
         for (var j=0; j<bar[i].length; j++) {
             var x = i*250 +150;
             var y = 500 - (j+1)*30;
-            if (diskNo != bar[i][j] drawDisk(bar[i]ij], x, y);  //円盤が移動中でないなら描く
+            if (diskNo != bar[i][j] drawDisk(bar[i],[j], x, y);  //円盤が移動中でないなら描く
         }
     }
+    //移動中の円盤の描画
+    if (diskNo > -1) drawDisk(diskNo, diskX, diskY);        //移動中の円盤があるなら描く
+    //クリア判定
+    if (bar[2].length == num) {                             //右端（GOAL）の棒に全ての円盤を置けたなら
+    document.getElementById("message").innerText = "CLEAR!";
+    }
 }
-
+function startMove(event) {
+    //円盤の移動開始
+    var x = event.clientX - canvasRect.left;                //キャンバス内のマウスカーソルの座標
+    var y = event.clientY - canvasRect.top;
+    barNo = -1;
+    if ((x > 70) && (x < 230) && (y > 100) && (y < 550) barNo = 0;  //マウスカーソルの座標によって棒の番号をセット
+    if ((x > 320) && (x < 480) && (y > 100) && (y < 550) barNo = 1;  //マウスカーソルの座標によって棒の番号をセット
+    if ((x > 570) && (x < 730) && (y > 100) && (y < 550) barNo = 2;  //マウスカーソルの座標によって棒の番号をセット
+    if ((barNo > -1) && (bar[barNo].length > 0) && (status == "manual")) {  //棒に円盤があり、statusが「manual」なら
+    mouseDown = true;
+    diskNo = bar[barNo][bar[barNo].length-1];                               //棒の一番上にある円盤の番号
+    diskX = x;                                                              //円盤の座標をマウスカーソルの座標にする
+    diskY = y;
+    update();}
+}
 
 
 
