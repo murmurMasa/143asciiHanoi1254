@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>ハノイの塔</title>
+<script>
+var canvas, context, canvasRect;     //キャンバス
+var num, cnt;                       //円盤の数、手数
+var bar = new Array(3);             //棒にセットされている円盤
+var diskNo, diskX, diskY, barNo;    //選択されている円盤の番号、位置、棒
+var mouseDown = false;              //マウスが押されているかどうか
+var answer, index, timer;           //回答、回答のインデックス、タイマー
+var status = "manual";              //ステータス(manual/auto)
 
+function init() {
+    //キャンバスの取得
+    canvas  = document.getElementById("base");      //キャンバスのＩＤ（180行）
+    context = canvas.getContext("2d");           
+    canvasRect = canvas.getboundingClientRect();    //キャンバスの矩形情報を取得
+    context.font = "20px Arial";                    //フォント　Arialでサイズ20pxに
+    context.textAlign = "center";                   //文字の基準位置、上下左右センターに
+    context.textbaseline = "middle";
+    //初期化
+    initDisk()
+}
+
+function initDisk() {
+    //初期化
+    cnt = 0;
+    barNo = -1;
+    diskNo = -1;
+    document.getElementById("cnt").innertext = cnt;     //手数表示エリアのID（178行）
+    document.getElementById("message").innerText = "";  //メッセージ表示エリアのID（178行）
+    status = "manual";
+    clearInterval(timer);                               //タイマーをクリア
+    //STARTの棒に全ての円盤をセット
+    num = Number(document.getElementById("num").value);
+    bar = [[], [], []];                                 //空の要素を３つ持つ二次元配列を作成
+    for (var i=num; i>0; i--) {
+        bar[0].push(i);                                 //左端（START）の棒に、指定した枚数の円盤をセット
+    }
+    update();
+}
+
+function drawDisk(n, x, y) {
+    //円盤の描画
+    var w = n*20 + 20;                                      //番号nの円盤の横幅
+    context.strokeStyle = "#000000";                        //円盤の枠線の色は黒
+    context.fillStyle = "hsl(" + (n-1)*40 + ", 100%, 50%)"; //円盤の塗りつぶし色
+    context.fillRect(x - w/2, y, w, 30);                    //横幅ｗ、高さ30の矩形を描く
+    context.strokeRect(x - w/2, y, w, 30);
+    context.fillStyle = "#000000";                          //文字の色は黒
+    context.fillText(n, x, y + 15);                         //円盤の番号を描く
+}
+
+
+
+
+</script>
+
+
+</head>
+<body>
+    
+</body>
+</html>
