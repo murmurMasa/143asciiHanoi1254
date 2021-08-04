@@ -53,6 +53,25 @@ function drawDisk(n, x, y) {
     context.fillText(n, x, y + 15);                         //円盤の番号を描く
 }
 
+function update() {
+    context.clearRect(0, 0, canvas.witdh, canvas.height);   // キャンバスをクリア
+    //棒の描画
+    var barName = ["START", "", "GOAL"];
+    for (var i=0; i<3; i++) {
+        context.fillStyle = "#996633";                      //棒の色は茶色
+        context.fillRect(i*250 + 140, 100, 20, 400);        //棒と台を描く
+        context.fillRect(i*250 + 70, 500, 160, 50);
+        context.fillStyle = "#FFFFFF";                      //文字の色は白
+        context.fillText(barName[i], i*250 + 150, 525);     //棒の名前（START、なし、GOALを描く
+        //円盤の描画
+        for (var j=0; j<bar[i].length; j++) {
+            var x = i*250 +150;
+            var y = 500 - (j+1)*30;
+            if (diskNo != bar[i][j] drawDisk(bar[i]ij], x, y);  //円盤が移動中でないなら描く
+        }
+    }
+}
+
 
 
 
