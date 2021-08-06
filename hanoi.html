@@ -16,7 +16,7 @@ function init() {
     //キャンバスの取得
     canvas  = document.getElementById("base");      //キャンバスのＩＤ（180行）
     context = canvas.getContext("2d");           
-    canvasRect = canvas.getboundingClientRect();    //キャンバスの矩形情報を取得
+    canvasRect = canvas.getBoundingClientRect();    //キャンバスの矩形情報を取得
     context.font = "20px Arial";                    //フォント　Arialでサイズ20pxに
     context.textAlign = "center";                   //文字の基準位置、上下左右センターに
     context.textbaseline = "middle";
@@ -54,7 +54,7 @@ function drawDisk(n, x, y) {
 }
 
 function update() {
-    context.clearRect(0, 0, canvas.witdh, canvas.height);   // キャンバスをクリア
+    context.clearRect(0, 0, canvas.width, canvas.height);   // キャンバスをクリア　ここがまちがってたのでキャンバスがクリアされてなくてずっと描画されたままだった
     //棒の描画
     var barName = ["START", "", "GOAL"];
     for (var i=0; i<3; i++) {
@@ -64,17 +64,17 @@ function update() {
         context.fillStyle = "#FFFFFF";                      //文字の色は白
         context.fillText(barName[i], i*250 + 150, 525);     //棒の名前（START、なし、GOALを描く
         //円盤の描画
-        for (var j=0; j<bar[i].length; j++) {
-            var x = i*250 +150;
+        for (var j=0; j < bar[i].length; j++) {
+            var x = i*250 + 150;
             var y = 500 - (j+1)*30;
-            if (diskNo != bar[i][j] drawDisk(bar[i],[j], x, y);  //円盤が移動中でないなら描く
+            if (diskNo != bar[i][j]) drawDisk(bar[i][j], x, y);  //円盤が移動中でないなら描く
         }
     }
     //移動中の円盤の描画
     if (diskNo > -1) drawDisk(diskNo, diskX, diskY);        //移動中の円盤があるなら描く
     //クリア判定
     if (bar[2].length == num) {                             //右端（GOAL）の棒に全ての円盤を置けたなら
-    document.getElementById("message").innerText = "CLEAR!";
+     document.getElementById("message").innerText = "CLEAR!";
     }
 }
 
@@ -83,9 +83,9 @@ function startMove(event) {
     var x = event.clientX - canvasRect.left;                //キャンバス内のマウスカーソルの座標
     var y = event.clientY - canvasRect.top;
     barNo = -1;
-    if ((x > 70) && (x < 230) && (y > 100) && (y < 550) barNo = 0;  //マウスカーソルの座標によって棒の番号をセット
-    if ((x > 320) && (x < 480) && (y > 100) && (y < 550) barNo = 1;  //マウスカーソルの座標によって棒の番号をセット
-    if ((x > 570) && (x < 730) && (y > 100) && (y < 550) barNo = 2;  //マウスカーソルの座標によって棒の番号をセット
+    if ((x > 70) && (x < 230) && (y > 100) && (y < 550)) barNo = 0;  //マウスカーソルの座標によって棒の番号をセット
+    if ((x > 320) && (x < 480) && (y > 100) && (y < 550)) barNo = 1;  //マウスカーソルの座標によって棒の番号をセット
+    if ((x > 570) && (x < 730) && (y > 100) && (y < 550)) barNo = 2;  //マウスカーソルの座標によって棒の番号をセット
     if ((barNo > -1) && (bar[barNo].length > 0) && (status == "manual")) {  //棒に円盤があり、statusが「manual」なら
        mouseDown = true;
        diskNo = bar[barNo][bar[barNo].length-1];                               //棒の一番上にある円盤の番号
@@ -107,7 +107,7 @@ function move(event) {
 function endMove(event) {
     //円盤の移動終了
     mouseDown = false;
-    var X = event.clientX - canvasRect.left;
+    var x = event.clientX - canvasRect.left;
     var y = event.clientY - canvasRect.top;
     var newBarNo = -1;
     if ((x > 70)&&(x < 230)&&(y > 100)&&(y < 550)) newBarNo = 0;    //移動先の棒の番号をセット
@@ -133,20 +133,53 @@ function hanoi(n, from, work, dest) {
     //解答の作成
     if(n > 0) {
         hanoi(n-1, from, dest, work);                               //nが0より大きいなら、nをひとつ減らし、移動先と作業用（work)を入れ替えて再起呼び出し
-        answer.push({"n": n, "from":from, "dest":dest]);            //番号nの円盤の移動元、移動先の棒を保存
+        answer.push({"n": n, "from":from, "dest":dest});            //番号nの円盤の移動元、移動先の棒を保存
         hanoi(n-1, work, from, dest);                               //nを一つ減らし、移動元と作業用(work)を入れ替えて再起呼び出し
     }
 }
 
 function showAnswer() {
-    
+    //解答作成
+    initDisk();
+    answer = [];                                                    //空の配列を作成
+    hanoi(num, 0, 1, 2);                                            //円盤がnum枚のときの解答を作成
+    //円盤の移動
+    index = 0;
+    status = "auto";
+    timer = setInterval(moveDisk, 500);                             //500ミリ秒ごとにmoveDisk()関数を実行    
 }
 
+function moveDisk() {
+    //円盤の移動
+    if (index < answer.length) {
+        bar[answer[index].from].pop();
+        bar[answer[index].dest].push(answer[index].n);              //円盤を新しい棒に移動
+        update();
+        index++;
+        document.getElementById("cnt").innerText = index;
+     } else {                                                       //すべての解答の移動を終えたら
+         //移動終了
+         clearInterval(timer);
+         status = "manual";
+     }
+}
 </script>
-
-
+<style>
+input[type="number"] {width: 40px;}
+#message {color: #CC0000;}
+</style>
 </head>
-<body>
-    
+<body onload="init()">
+<p>ハノイの塔</p>
+<input type="button" value="解答" onclick="showAnswer()">
+<input type="button" value="リセット" onclick="initDisk()">
+円盤の数：
+<input type="number" id="num" value="4" min="3" max="9" onchange="initDisk()">
+手数: <span id="cnt">0</span> <span id="message"></span>
+<hr>
+<canvas id="base" width="800" height="600"
+  onmousedown="startMove(event)" onmousemove="move(event)"
+  onmouseup="endMove(event)" onmouseleave="endMove(event)">
+</canvas> 
 </body>
 </html>
