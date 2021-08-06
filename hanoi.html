@@ -77,6 +77,7 @@ function update() {
     document.getElementById("message").innerText = "CLEAR!";
     }
 }
+
 function startMove(event) {
     //円盤の移動開始
     var x = event.clientX - canvasRect.left;                //キャンバス内のマウスカーソルの座標
@@ -86,14 +87,60 @@ function startMove(event) {
     if ((x > 320) && (x < 480) && (y > 100) && (y < 550) barNo = 1;  //マウスカーソルの座標によって棒の番号をセット
     if ((x > 570) && (x < 730) && (y > 100) && (y < 550) barNo = 2;  //マウスカーソルの座標によって棒の番号をセット
     if ((barNo > -1) && (bar[barNo].length > 0) && (status == "manual")) {  //棒に円盤があり、statusが「manual」なら
-    mouseDown = true;
-    diskNo = bar[barNo][bar[barNo].length-1];                               //棒の一番上にある円盤の番号
-    diskX = x;                                                              //円盤の座標をマウスカーソルの座標にする
-    diskY = y;
-    update();}
+       mouseDown = true;
+       diskNo = bar[barNo][bar[barNo].length-1];                               //棒の一番上にある円盤の番号
+       diskX = x;                                                              //円盤の座標をマウスカーソルの座標にする
+       diskY = y;
+    update();
+    }
 }
 
+function move(event) {
+    //円盤移動中
+    if (mouseDown) {                                                //マウスボタンを押しているなら
+        diskX = event.clientX - canvasRect.left;                    //円盤の座標をマウスカーソルの座標にする
+        diskY = event.clientY - canvasRect.top;
+        update();
+    }
+}
 
+function endMove(event) {
+    //円盤の移動終了
+    mouseDown = false;
+    var X = event.clientX - canvasRect.left;
+    var y = event.clientY - canvasRect.top;
+    var newBarNo = -1;
+    if ((x > 70)&&(x < 230)&&(y > 100)&&(y < 550)) newBarNo = 0;    //移動先の棒の番号をセット
+    if ((x > 320)&&(x < 480)&&(y > 100)&&(y < 550)) newBarNo = 1;    //移動先の棒の番号をセット
+    if ((x > 570)&&(x < 730)&&(y > 100)&&(y < 550)) newBarNo = 2;    //移動先の棒の番号をセット
+    if ((newBarNo > -1)&&(diskNo > -1)) {
+        //移動
+        if ((bar[newBarNo].length == 0) ||                          //棒に円盤が無いか、一番上の円盤が移動中の円盤より大きいなら
+           ((bar[newBarNo].lenght > 0)&&
+           (diskNo < bar[newBarNo][bar[newBarNo].length-1]))) {
+           bar[barNo].pop();                                        //円盤を新しい棒に移動
+           bar[newBarNo].push(diskNo);
+           //手数を更新
+           cnt++;
+           document.getElementById("cnt").innerText = cnt;
+           }
+    }
+    diskNo = -1;
+    update();
+}
+
+function hanoi(n, from, work, dest) {
+    //解答の作成
+    if(n > 0) {
+        hanoi(n-1, from, dest, work);                               //nが0より大きいなら、nをひとつ減らし、移動先と作業用（work)を入れ替えて再起呼び出し
+        answer.push({"n": n, "from":from, "dest":dest]);            //番号nの円盤の移動元、移動先の棒を保存
+        hanoi(n-1, work, from, dest);                               //nを一つ減らし、移動元と作業用(work)を入れ替えて再起呼び出し
+    }
+}
+
+function showAnswer() {
+    
+}
 
 </script>
 
